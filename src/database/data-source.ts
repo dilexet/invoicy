@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { InvoiceEntity } from './entity/invoice.entity';
 
 const options: DataSourceOptions = {
   type: 'postgres',
@@ -11,7 +12,7 @@ const options: DataSourceOptions = {
   useUTC: true,
   synchronize: true,
   logging: false,
-  entities: [],
+  entities: [InvoiceEntity],
 };
 
 export const dataSource = new DataSource(options);
