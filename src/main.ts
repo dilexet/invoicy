@@ -23,9 +23,7 @@ async function bootstrap() {
       console.log(
         `Server started on http://${config.get<string>(
           'HOST',
-        )}:${config.get<number>('PORT')}/${config.get<number>(
-          'SWAGGER_PATH',
-        )}`,
+        )}:${config.get<number>('PORT')}/${config.get<number>('SWAGGER_PATH')}`,
       );
     },
   );
