@@ -3,11 +3,11 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 
 const options: DataSourceOptions = {
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'root',
-  database: 'invoice_db',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   useUTC: true,
   synchronize: true,
   logging: false,
