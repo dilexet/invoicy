@@ -1,21 +1,34 @@
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-import { dataSource } from './database/data-source';
-import * as process from 'process';
 
 async function bootstrap() {
-  dataSource
-    .initialize()
-    .then(async () => {
-      const app = await NestFactory.create(AppModule);
-      console.log();
-      await app.listen(process.env.PORT, process.env.HOST, () => {
-        console.log(
-          `Server started on http://${process.env.HOST}:${process.env.PORT}/`,
-        );
-      });
-    })
-    .catch((error) => console.log(error));
+  const app = await NestFactory.create(AppModule);
+  const config: ConfigService = app.get(ConfigService);
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(config.get<string>('SWAGGER_TITLE'))
+    .setDescription(config.get<string>('SWAGGER_DESCRIPTION'))
+    .setVersion(config.get<string>('SWAGGER_VERSION'))
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup(config.get<string>('SWAGGER_PATH'), app, document);
+
+  await app.listen(
+    config.get<number>('PORT'),
+    config.get<string>('HOST'),
+    () => {
+      console.log(
+        `Server started on http://${config.get<string>(
+          'HOST',
+        )}:${config.get<number>('PORT')}/${config.get<number>(
+          'SWAGGER_PATH',
+        )}`,
+      );
+    },
+  );
 }
 
 bootstrap();
