@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InvoiceEntity } from '../database/entity/invoice.entity';
+import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceViewModel } from './view-model/invoice.view-model';
 import { Mapper } from '@automapper/core';

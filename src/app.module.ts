@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
-import { InvoiceModule } from './invoice/invoice.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 

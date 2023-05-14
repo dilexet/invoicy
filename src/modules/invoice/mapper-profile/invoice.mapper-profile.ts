@@ -7,8 +7,8 @@ import {
   Mapper,
   MappingProfile,
 } from '@automapper/core';
-import { CompletedWorkEntity } from '../../database/entity/completed-work.entity';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
+import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
+import { InvoiceEntity } from '../../../database/entity/invoice.entity';
 import { CreateInvoiceDto } from '../dto/create-invoice.dto';
 import { CompletedWorkDto } from '../dto/completed-work.dto';
 import { CompletedWorkViewModel } from '../view-model/completed-work.view-model';

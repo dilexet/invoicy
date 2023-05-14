@@ -8,7 +8,7 @@ import {
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceViewModel } from './view-model/invoice.view-model';
-import { ExceptionModel } from '../model/exception.model';
+import { ExceptionModel } from '../../model/exception.model';
 
 @ApiTags('Invoice')
 @Controller('api/invoice')
