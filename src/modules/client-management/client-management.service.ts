@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateClientManagementDto } from './dto/create-client-management.dto';
-import { UpdateClientManagementDto } from './dto/update-client-management.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectMapper } from '@automapper/nestjs';
+import { Mapper } from '@automapper/core';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ClientEntity } from '../../database/entity/client.entity';
+import { CreateClientInfoDto } from './dto/create-client-info.dto';
+import { ClientViewModel } from './view-model/client.view-model';
 
 @Injectable()
 export class ClientManagementService {
-  create(createClientManagementDto: CreateClientManagementDto) {
-    return 'This action adds a new clientManagement';
-  }
+  constructor(
+    @InjectMapper() private readonly mapper: Mapper,
+    @InjectRepository(ClientEntity)
+    private clientEntityRepository: Repository<ClientEntity>,
+  ) {}
 
-  findAll() {
-    return `This action returns all clientManagement`;
-  }
+  // TODO: email verify when started use mailgun
+  async createAsync(
+    createClientManagementDto: CreateClientInfoDto,
+  ): Promise<ClientViewModel> {
+    if (
+      (await this.clientEntityRepository.findOneBy({
+        email: createClientManagementDto.email,
+      })) !== null
+    ) {
+      throw new BadRequestException(
+        'A client with this email has already been created',
+      );
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} clientManagement`;
-  }
+    const clientEntity = this.mapper.map(
+      createClientManagementDto,
+      CreateClientInfoDto,
+      ClientEntity,
+    );
+    const clientEntityCreated = await this.clientEntityRepository.save(
+      clientEntity,
+    );
 
-  update(id: number, updateClientManagementDto: UpdateClientManagementDto) {
-    return `This action updates a #${id} clientManagement`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} clientManagement`;
+    return this.mapper.map(clientEntityCreated, ClientEntity, ClientViewModel);
   }
 }

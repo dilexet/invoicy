@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ExceptionModel } from '../../model/exception.model';
+import { ClientViewModel } from './view-model/client.view-model';
+import { CreateClientInfoDto } from './dto/create-client-info.dto';
 import { ClientManagementService } from './client-management.service';
-import { CreateClientManagementDto } from './dto/create-client-management.dto';
-import { UpdateClientManagementDto } from './dto/update-client-management.dto';
 
-@Controller('client-management')
+@ApiTags('Client management')
+@Controller('api/client-management')
 export class ClientManagementController {
-  constructor(private readonly clientManagementService: ClientManagementService) {}
+  constructor(
+    private readonly clientManagementService: ClientManagementService,
+  ) {}
 
   @Post()
-  create(@Body() createClientManagementDto: CreateClientManagementDto) {
-    return this.clientManagementService.create(createClientManagementDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.clientManagementService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientManagementService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientManagementDto: UpdateClientManagementDto) {
-    return this.clientManagementService.update(+id, updateClientManagementDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientManagementService.remove(+id);
+  @ApiBody({
+    type: CreateClientInfoDto,
+  })
+  @ApiCreatedResponse({
+    description: 'The client information has been successfully created.',
+    type: ClientViewModel,
+  })
+  @ApiBadRequestResponse({
+    description: 'The client information was not created.',
+    type: ExceptionModel,
+  })
+  async create(
+    @Body() createClientManagementDto: CreateClientInfoDto,
+  ): Promise<ClientViewModel> {
+    return await this.clientManagementService.createAsync(
+      createClientManagementDto,
+    );
   }
 }
