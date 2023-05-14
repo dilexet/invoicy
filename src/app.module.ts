@@ -5,6 +5,7 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
+import { ClientManagementModule } from './modules/client-management/client-management.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AutomapperModule } from '@automapper/nestjs';
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     AutomapperModule.forRoot({ strategyInitializer: classes() }),
     InvoiceModule,
+    ClientManagementModule,
   ],
 })
 export class AppModule {}
