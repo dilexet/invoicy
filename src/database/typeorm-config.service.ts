@@ -17,10 +17,10 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: this.config.get<string>('DB_NAME'),
       username: this.config.get<string>('DB_USERNAME'),
       password: this.config.get<string>('DB_PASSWORD'),
-      entities: [InvoiceEntity, CompletedWorkEntity],
       migrationsTableName: 'typeorm_migrations',
       logger: 'file',
       synchronize: true,
+      autoLoadEntities: true
     };
   }
 }
