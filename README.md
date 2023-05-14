@@ -1,73 +1,78 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+### Legend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Фрилансер Margaret Brick работает в своей небольшой веб-студии Brick and Willow Design, и оказывает разного рода услуги
+своим клиентам, начиная от разработки логотипов, и заканчивая версткой сайтов-визиток. Словом, все что попросят. Клиенты
+Маргарет любят, и постоянно к ней обращаются. Маргарет работает в одиночку, иногда с рутинными делами ей помогает ее
+друг Carlo. Маргарет старается автоматизировать часто повторяющиеся дела, и просит помощи своего друга-программиста. Вот
+и сейчас Маргарет попросила Карло помочь с автоматизацией отправки клиентам счетов для оплаты ее услуг.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Task description
 
-## Description
+Необходимо спроектировать и разработать небольшой сервис для генерации счетов на оплату
+(инвойсов), и отправку счетов на электронную почту клиентам.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Workflow
 
-## Installation
+1. Клиент отправляет HTTP-запрос на сервис, передавая на API:
+    - email-адрес, на который требуется выслать счет на оплату,
+    - содержание выполненных работ, в виде списка работ и стоимости по каждому пункту.
+2. Сервис логгирует входящий запрос путем создания записи в базе данных.
+3. Сервис получает дополнительную информацию для генерации инвойса из базы данных, используя email как ключ для поиска:
+    - информацию о клиенте (first name, last name),
+    - информацию о компании, в которой работает получатель счета.
+4. Сервис генерирует PDF-документ на основе шаблона. PDF включает:
+    - информацию о клиенте,
+    - информацию о компании клиента,
+    - общую сумму для оплаты,
+    - список выполненных работ и их стоимость,
+    - номер инвойса,
+    - дату выставления инвойса,
+    - информацию об отправителе (имя, адрес, и тд).
+5. Сервис отправляет PDF-документ на электронную почту, как прикрепленный файл.
+    - информацию о клиенте (first name, last name),
+    - информацию о компании, в которой работает получатель счета.
 
-```bash
-$ npm install
-```
+### Требования к реализации (рекомендательного характера)
 
-## Running the app
+1. Платформа для создания сервиса — Node.js.
+2. PostgreSQL в качестве сервера баз данных.
+3. Отправку почты через сервис Mailgun.
+4. Использовать архитектуру основанную на очередях для выполнения асинхронных задач:
+    - генерация PDF-документа,
+    - отправку электронного сообщения. Для этого можно использовать систему BullMQ, ​ https://docs.bullmq.io​ .
+5. Для генерации PDF использовать библиотеку html-pdf-node​ (https://www.npmjs.com/package/html-pdf-node), html-pdf или
+   любую другую.
+6. Для документирования использовать сервис — Swagger (Open API).
 
-```bash
-# development
-$ npm run start
+Можно использовать любые общедоступные библиотеки, которые сочтёте нужным.
+Если есть энтузиазм, желание, и время — автоматические тесты будут только плюсом.
 
-# watch mode
-$ npm run start:dev
+### Примечания
 
-# production mode
-$ npm run start:prod
-```
+1. Плюсом будет использование ​ docker-compose​ для организации работы с
+   инфраструктурами вещами (Postgres, Redis, etc).
+1. Пример шаблона для инвойса (“красота верстки” не обязательна):
+    - https://jumbotron-production-f.squarecdn.com/assets/72450bb7af7a27ac77a3.jpg
+    - пример взят отсюда: ​ https://squareup.com/us/en/townsquare/invoice-examples​ , see “Example invoice for
+      freelancers”
+1. Плюсом будет использование TypeScript
+1. Тестирование работоспособности сервиса будет выполняться с помощью любого HTTP-клиента, например ​ curl​ или Postman
+   API Client.
+1. Во время написания сервиса не стоит изобретать велосипеды, лучше взять что-то
+   существующие.
 
-## Test
+### Результат работы
 
-```bash
-# unit tests
-$ npm run test
+1. Мы хотели бы видеть результат выполнения в репозитории на GitHub. По ходу
+   выполнения задания, делайте логически обоснованные атомарные коммиты.
+2. В репозитории может быть готовая или промежуточная реализация тестового задания.
+3. Приложите пожалуйста инструкцию для запуска и тестирования сервиса.
+4. В репозитории также должен быть SQL-скрипт создания таблиц в базе данных.
 
-# e2e tests
-$ npm run test:e2e
+### Наводящие вопросы
 
-# test coverage
-$ npm run test:cov
-```
+1. Вопросы масштабирования
+2. SOLID
+3. https://12factor.net/ru/
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+&copy; Twelvedevs
