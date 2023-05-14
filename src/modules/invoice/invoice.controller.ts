@@ -25,9 +25,11 @@ export class InvoiceController {
   })
   @ApiBadRequestResponse({
     description: 'The invoice was not created.',
-    type: ExceptionModel
+    type: ExceptionModel,
   })
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoiceService.createAsync(createInvoiceDto);
+  async create(
+    @Body() createInvoiceDto: CreateInvoiceDto,
+  ): Promise<InvoiceViewModel> {
+    return await this.invoiceService.createAsync(createInvoiceDto);
   }
 }
