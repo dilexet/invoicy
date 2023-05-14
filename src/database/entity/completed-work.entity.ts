@@ -3,7 +3,7 @@ import { BaseEntity } from './base.entity';
 import { InvoiceEntity } from './invoice.entity';
 import { AutoMap } from '@automapper/classes';
 
-@Entity()
+@Entity({ name: 'completed_works' })
 export class CompletedWorkEntity extends BaseEntity {
   @Column({ nullable: false })
   @AutoMap()
