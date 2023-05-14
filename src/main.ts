@@ -1,10 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
+
   const config: ConfigService = app.get(ConfigService);
 
   const swaggerConfig = new DocumentBuilder()
@@ -23,9 +26,7 @@ async function bootstrap() {
       console.log(
         `Server started on http://${config.get<string>(
           'HOST',
-        )}:${config.get<number>('PORT')}/${config.get<number>(
-          'SWAGGER_PATH',
-        )}`,
+        )}:${config.get<number>('PORT')}/${config.get<number>('SWAGGER_PATH')}`,
       );
     },
   );

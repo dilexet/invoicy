@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { InvoiceEntity } from './entity/invoice.entity';
+import { CompletedWorkEntity } from './entity/completed-work.entity';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -16,7 +17,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: this.config.get<string>('DB_NAME'),
       username: this.config.get<string>('DB_USERNAME'),
       password: this.config.get<string>('DB_PASSWORD'),
-      entities: [InvoiceEntity],
+      entities: [InvoiceEntity, CompletedWorkEntity],
       migrationsTableName: 'typeorm_migrations',
       logger: 'file',
       synchronize: true,
