@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { AutoMap } from '@automapper/classes';
 
 export class CreateClientInfoDto {
@@ -31,4 +31,14 @@ export class CreateClientInfoDto {
   @IsEmail()
   @AutoMap()
   email: string;
+
+  @ApiProperty({
+    type: String,
+    default: '5a66dd65-ba37-4ea8-a505-fc6f4a116b33',
+    description: 'Company id',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsUUID(4)
+  companyId: string;
 }

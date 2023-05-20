@@ -6,6 +6,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { ClientManagementModule } from './modules/client-management/client-management.module';
+import { CompanyManagementModule } from './modules/company-management/company-management.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ClientManagementModule } from './modules/client-management/client-manag
     AutomapperModule.forRoot({ strategyInitializer: classes() }),
     InvoiceModule,
     ClientManagementModule,
+    CompanyManagementModule,
   ],
 })
 export class AppModule {}

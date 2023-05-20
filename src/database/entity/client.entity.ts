@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
-import { BaseEntity } from './base.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
+import { BaseEntity } from './base.entity';
+import { CompanyEntity } from './company.entity';
 
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity {
@@ -15,4 +16,10 @@ export class ClientEntity extends BaseEntity {
   @Column({ nullable: false, unique: true })
   @AutoMap()
   email: string;
+
+  @ManyToOne(() => CompanyEntity, (entity) => entity.employees, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  company: Promise<CompanyEntity>;
 }
