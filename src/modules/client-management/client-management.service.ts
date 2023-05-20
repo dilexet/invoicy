@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ClientEntity } from '../../database/entity/client.entity';
 import { CreateClientInfoDto } from './dto/create-client-info.dto';
 import { ClientViewModel } from './view-model/client.view-model';
+import { CompanyEntity } from '../../database/entity/company.entity';
 
 @Injectable()
 export class ClientManagementService {
@@ -13,6 +14,8 @@ export class ClientManagementService {
     @InjectMapper() private readonly mapper: Mapper,
     @InjectRepository(ClientEntity)
     private clientEntityRepository: Repository<ClientEntity>,
+    @InjectRepository(CompanyEntity)
+    private companyEntityRepository: Repository<CompanyEntity>,
   ) {}
 
   // TODO: email verify when started use mailgun
@@ -29,11 +32,22 @@ export class ClientManagementService {
       );
     }
 
+    const clientCompany = await this.companyEntityRepository.findOneBy({
+      id: createClientManagementDto.companyId,
+    });
+
+    if (!clientCompany) {
+      throw new BadRequestException('This company does not exist');
+    }
+
     const clientEntity = this.mapper.map(
       createClientManagementDto,
       CreateClientInfoDto,
       ClientEntity,
     );
+
+    clientEntity.company = Promise.resolve(clientCompany);
+
     const clientEntityCreated = await this.clientEntityRepository.save(
       clientEntity,
     );
