@@ -38,12 +38,10 @@ export class CompanyManagementService {
       companyEntityMapped,
     );
 
-    const result = this.mapper.map(
+    return this.mapper.map(
       companyEntityCreated,
       CompanyEntity,
       CompanyViewModel,
     );
-
-    return result;
   }
 }
