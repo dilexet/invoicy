@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { CompletedWorkDto } from './completed-work.dto';
 import { AutoMap } from '@automapper/classes';
 
-export class CreateInvoiceDto {
+export class CreatePaymentDto {
   @ApiProperty({
     type: String,
     default: 'user@gmail.com',

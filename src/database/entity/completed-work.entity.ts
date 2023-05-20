@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { InvoiceEntity } from './invoice.entity';
+import { PaymentEntity } from './paymentEntity';
 import { AutoMap } from '@automapper/classes';
 
 @Entity({ name: 'completed_works' })
@@ -13,8 +13,8 @@ export class CompletedWorkEntity extends BaseEntity {
   @AutoMap()
   price: number;
 
-  @ManyToOne(() => InvoiceEntity, (entity) => entity.completedWorks, {
+  @ManyToOne(() => PaymentEntity, (entity) => entity.completedWorks, {
     onDelete: 'CASCADE',
   })
-  invoice: InvoiceEntity;
+  invoice: PaymentEntity;
 }

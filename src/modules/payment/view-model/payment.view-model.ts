@@ -2,7 +2,7 @@ import { CompletedWorkViewModel } from './completed-work.view-model';
 import { AutoMap } from '@automapper/classes';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class InvoiceViewModel {
+export class PaymentViewModel {
   @ApiProperty()
   @AutoMap()
   invoiceNumber: number;

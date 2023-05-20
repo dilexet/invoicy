@@ -3,8 +3,8 @@ import { BaseEntity } from './base.entity';
 import { CompletedWorkEntity } from './completed-work.entity';
 import { AutoMap } from '@automapper/classes';
 
-@Entity({ name: 'invoices' })
-export class InvoiceEntity extends BaseEntity {
+@Entity({ name: 'payments' })
+export class PaymentEntity extends BaseEntity {
   @Column({ unique: true, generated: 'increment', nullable: false })
   @AutoMap()
   invoiceNumber: number;

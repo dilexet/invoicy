@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
-import { InvoiceEntity } from './entity/invoice.entity';
+import { PaymentEntity } from './entity/paymentEntity';
 import { CompletedWorkEntity } from './entity/completed-work.entity';
 
 @Injectable()

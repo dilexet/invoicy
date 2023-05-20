@@ -8,14 +8,14 @@ import {
   MappingProfile,
 } from '@automapper/core';
 import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
-import { InvoiceEntity } from '../../../database/entity/invoice.entity';
-import { CreateInvoiceDto } from '../dto/create-invoice.dto';
+import { PaymentEntity } from '../../../database/entity/paymentEntity';
+import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { CompletedWorkDto } from '../dto/completed-work.dto';
 import { CompletedWorkViewModel } from '../view-model/completed-work.view-model';
-import { InvoiceViewModel } from '../view-model/invoice.view-model';
+import { PaymentViewModel } from '../view-model/payment.view-model';
 
 @Injectable()
-export class InvoiceMapperProfile extends AutomapperProfile {
+export class PaymentMapperProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
     super(mapper);
   }
@@ -25,8 +25,8 @@ export class InvoiceMapperProfile extends AutomapperProfile {
       createMap(mapper, CompletedWorkDto, CompletedWorkEntity);
       createMap(
         mapper,
-        CreateInvoiceDto,
-        InvoiceEntity,
+        CreatePaymentDto,
+        PaymentEntity,
         forMember(
           (dest) => dest.completedWorks,
           mapFrom((source) =>
@@ -42,8 +42,8 @@ export class InvoiceMapperProfile extends AutomapperProfile {
       createMap(mapper, CompletedWorkEntity, CompletedWorkViewModel);
       createMap(
         mapper,
-        InvoiceEntity,
-        InvoiceViewModel,
+        PaymentEntity,
+        PaymentViewModel,
         forMember(
           (dest) => dest.completedWorks,
           mapFrom((source) =>
