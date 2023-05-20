@@ -7,6 +7,7 @@ import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { ClientManagementModule } from './modules/client-management/client-management.module';
 import { CompanyManagementModule } from './modules/company-management/company-management.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CompanyManagementModule } from './modules/company-management/company-ma
     PaymentModule,
     ClientManagementModule,
     CompanyManagementModule,
+    InvoiceModule,
   ],
 })
 export class AppModule {}
