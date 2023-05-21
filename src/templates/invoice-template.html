@@ -1,69 +1,353 @@
 <html lang='en'>
 <head>
+<!--  TODO: change colors (light theme)-->
   <title>Invoice</title>
   <style>
       body {
           font-family: Arial, sans-serif;
           margin: 0;
-          padding: 20px;
+          padding: 0;
       }
 
-      h1, h2 {
-          margin-bottom: 10px;
+      h1, h2, h3, h4, h5, h6, p, th, td {
+          color: #FEF4F4;
+          font-weight: 100;
       }
 
-      table {
+      main {
           width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
+          padding: 0 0 30px;
+          background-color: #503A3A;
       }
 
-      th, td {
-          border: 1px solid #ccc;
-          padding: 8px;
+      .delimiter {
+          width: 100%;
+          height: 2px;
+          margin: 10px 0 10px;
+          background-color: #6E5050;
+      }
+
+      .invoice-header {
+          width: 100%;
+          padding: 5px 0 15px;
+          background-color: #2E2828;
+      }
+
+      .invoice-header-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 20px;
+      }
+
+      .invoice-title-text {
+          letter-spacing: 3px;
+          font-weight: 400;
+          color: #F65151;
+      }
+
+      .invoice-main-wrapper {
+          padding: 10px 20px 0;
+      }
+
+      .invoice-main {
+          margin: 10px 0 20px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+      }
+
+      .client-block {
+          width: 50%;
+      }
+
+      .client-block-text {
+          font-size: 16px;
+          font-weight: 300;
+          line-height: 30px;
+      }
+
+      .client-name-text {
+          font-weight: 600;
+      }
+
+      .invoice-block {
+          width: 50%;
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-end;
+      }
+
+      .invoice-block-wrapper {
+          text-align: right;
+      }
+
+      .invoice-block-text {
+          font-size: 0.8em;
+          letter-spacing: 0.09em;
+          line-height: 30px;
+      }
+
+      .invoice-block-title {
+          text-transform: uppercase;
+      }
+
+      .invoice-block-date-text {
+          font-weight: 600;
+          line-height: 10px;
+      }
+
+      .invoice-block-price-text {
+          font-weight: 500;
+          letter-spacing: 0.05em;
+      }
+
+      .client-information {
+          margin: 10px 0 20px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+      }
+
+      .client-information .left {
+          width: 50%;
+      }
+
+      .client-information .right {
+          width: 50%;
+          text-align: right;
+      }
+
+      .client-information-title {
+          color: #F6D6D6;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+      }
+
+      .client-information-text {
+          font-weight: 400;
+          letter-spacing: 0.01em;
+      }
+
+      .invoice-description-container p span {
+          font-weight: 500;
+          letter-spacing: 0.01em;
+      }
+
+      .completed-works-information {
+          margin: 30px 0 20px;
+          width: 100%;
+      }
+
+      .completed-works-information table {
+          width: 100%;
+      }
+
+      .completed-works-information table td {
+          font-weight: 600;
+          line-height: 40px;
+          color: #EBE2E2;
+          font-size: 15px;
+      }
+
+      .completed-works-information table .title {
+          letter-spacing: 0.02em;
+      }
+
+      .completed-works-information table .price {
+          text-align: right;
+          letter-spacing: 0.01em;
+      }
+
+      .total-price-container {
+          width: 100%;
+      }
+
+      .total-price-content {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+      }
+
+      .total-price-text {
+          font-size: 19px;
+          font-weight: 900;
+          letter-spacing: 0.02em;
+          color: #EBE2E2;
+      }
+
+      .footer {
+          width: 100%;
+          padding: 20px 0 0;
+          background-color: #4B3636;
+      }
+
+      .sender-information {
+          padding: 20px 0;
+          display: flex;
+          flex-direction: column;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .sender-information > * {
+          flex: 1 1 5px;
+      }
+
+      .sender-information h3 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #F6D6D6;
+          line-height: 5px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+      }
+
+      .sender-information h4 {
+          line-height: 1px;
       }
   </style>
 </head>
 <body>
-<h1>Invoice</h1>
 
-<h2>Client Information:</h2>
-<p>First Name: {{ client.firstName }}</p>
-<p>Last Name: {{ client.lastName }}</p>
-<p>Email: {{ client.email }}</p>
+<div>
+  <div class='invoice-header'>
 
-<h2>Client Company Information:</h2>
-<p>Name: {{ clientCompany.name }}</p>
-<p>Address: {{ clientCompany.address }}</p>
-<p>Phone: {{ clientCompany.phone }}</p>
+  </div>
+</div>
+<div>
+  <div class='invoice-header'>
+    <div class='invoice-header-container'>
+      <h2>
+        {{ sender.organization }}
+      </h2>
+      <h1 class='invoice-title-text'>
+        Invoice
+      </h1>
+    </div>
+  </div>
 
-<h2>Invoice Details:</h2>
-<p>Invoice Number: {{ invoiceNumber }}</p>
-<p>Invoice Date: {{ invoiceDate }}</p>
+  <main>
+    <div class='invoice-main-wrapper'>
 
-<h2>Invoice Items:</h2>
-<table>
-  <thead>
-  <tr>
-    <th>Item</th>
-    <th>Price</th>
-  </tr>
-  </thead>
-  <tbody>
-  {{#each invoiceItems}}
-  <tr>
-    <td>{{ this.item }}</td>
-    <td>{{ this.price }}</td>
-  </tr>
-  {{/each}}
-  </tbody>
-</table>
+      <div class='invoice-main'>
+        <div class='client-block'>
+          <p class='client-block-text'>
+            Hello, <span class='client-name-text'>{{ client.lastName }} {{ client.firstName }}</span>.
+            Thank you for your order.
+          </p>
+        </div>
+        <div class='invoice-block'>
+          <div class='invoice-block-wrapper'>
+            <p class='invoice-block-text'>
+        <span class='invoice-block-title'>
+          invoice
+        </span>
+              #{{ invoiceNumber }}
+            </p>
+            <p class='invoice-block-date-text'>
+              {{ invoiceDate }}
+            </p>
+            <p class='invoice-block-price-text'>
+              ${{ totalPrice }}
+            </p>
+          </div>
+        </div>
+      </div>
 
-<h2>Total Amount: {{ totalAmount }}</h2>
+      <div class='delimiter'></div>
 
-<h2>Sender Information:</h2>
-<p>Organization: {{ sender.organization }}</p>
-<p>Address: {{ sender.address }}</p>
-<p>Phone: {{ sender.phone }}</p>
+      <div class='client-information'>
+        <div class='left'>
+          <h3 class='client-information-title'>
+            Customer
+          </h3>
+          <p class='client-information-text'>
+            {{ client.lastName }} {{ client.firstName }}
+          </p>
+          <p class='client-information-text'>
+            {{ client.email }}
+          </p>
+        </div>
+        <div class='right'>
+          <h3 class='client-information-title'>
+            Customer company
+          </h3>
+          <p class='client-information-text'>
+            {{ company.name }}
+          </p>
+          <p class='client-information-text'>
+            {{ company.address }}
+          </p>
+          <p class='client-information-text'>
+            {{ company.phone }}
+          </p>
+        </div>
+      </div>
+
+      <div class='delimiter'></div>
+
+      <div class='invoice-description-container'>
+        <p>
+          This invoice is for work completed by <span>{{ sender.organization }}</span>, with the final project delivered
+          on
+          <span>{{ invoiceDate }}</span>.
+        </p>
+        <div class='delimiter'></div>
+        <p>
+          It was pleasure to work with you and your team. Please let me know if you have any questions, and we hope you
+          will keep us in mind for future freelance projects. Thank you!
+        </p>
+      </div>
+
+      <div class='delimiter'></div>
+
+      <div class='completed-works-information'>
+        <table>
+          <tbody>
+          {{#each completedWorks}}
+          <tr class='item'>
+            <td class='title'>{{ this.title }}</td>
+            <td class='price'>${{ this.price }}</td>
+          </tr>
+          {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class='delimiter'></div>
+
+      <div class='total-price-container'>
+        <div class='total-price-content'>
+          <h4 class='total-price-text'>
+            Total price
+          </h4>
+          <h4 class='total-price-text'>
+            ${{ totalPrice }}
+          </h4>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class='footer'>
+    <div class='sender-information'>
+      <h3>
+        Sender organization
+      </h3>
+      <h4>
+        {{ sender.organization }}
+      </h4>
+      <h4>
+        {{ sender.address }}
+      </h4>
+      <h4>
+        {{ sender.phone }}
+      </h4>
+    </div>
+  </div>
+</div>
 </body>
 </html>
