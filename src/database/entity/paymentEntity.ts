@@ -1,7 +1,8 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { AutoMap } from '@automapper/classes';
 import { BaseEntity } from './base.entity';
 import { CompletedWorkEntity } from './completed-work.entity';
-import { AutoMap } from '@automapper/classes';
+import { ClientEntity } from './client.entity';
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
@@ -9,13 +10,15 @@ export class PaymentEntity extends BaseEntity {
   @AutoMap()
   invoiceNumber: number;
 
-  @Column({ nullable: false })
-  @AutoMap()
-  email: string;
-
   @OneToMany(() => CompletedWorkEntity, (entity) => entity.invoice, {
     cascade: true,
     onDelete: 'SET NULL',
   })
-  completedWorks: CompletedWorkEntity[];
+  completedWorks: Promise<CompletedWorkEntity[]>;
+
+  @ManyToOne(() => ClientEntity, (entity) => entity.payments, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  client: Promise<ClientEntity>;
 }

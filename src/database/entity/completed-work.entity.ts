@@ -16,5 +16,5 @@ export class CompletedWorkEntity extends BaseEntity {
   @ManyToOne(() => PaymentEntity, (entity) => entity.completedWorks, {
     onDelete: 'CASCADE',
   })
-  invoice: PaymentEntity;
+  invoice: Promise<PaymentEntity>;
 }
