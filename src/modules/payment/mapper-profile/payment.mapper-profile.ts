@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
 import {
+  afterMap,
   createMap,
   forMember,
-  mapFrom,
+  ignore,
   Mapper,
   MappingProfile,
 } from '@automapper/core';
@@ -27,16 +28,16 @@ export class PaymentMapperProfile extends AutomapperProfile {
         mapper,
         CreatePaymentDto,
         PaymentEntity,
-        forMember(
-          (dest) => dest.completedWorks,
-          mapFrom((source) =>
-            mapper.mapArray(
-              source.completedWorks,
-              CompletedWorkDto,
-              CompletedWorkEntity,
-            ),
-          ),
-        ),
+        forMember((dest) => dest.completedWorks, ignore()),
+        afterMap(async (source, destination) => {
+          const completedWorkEntities = mapper.mapArray(
+            source.completedWorks,
+            CompletedWorkDto,
+            CompletedWorkEntity,
+          );
+
+          destination.completedWorks = Promise.resolve(completedWorkEntities);
+        }),
       );
 
       createMap(mapper, CompletedWorkEntity, CompletedWorkViewModel);
@@ -44,16 +45,15 @@ export class PaymentMapperProfile extends AutomapperProfile {
         mapper,
         PaymentEntity,
         PaymentViewModel,
-        forMember(
-          (dest) => dest.completedWorks,
-          mapFrom((source) =>
-            mapper.mapArray(
-              source.completedWorks,
-              CompletedWorkEntity,
-              CompletedWorkViewModel,
-            ),
-          ),
-        ),
+        forMember((dest) => dest.completedWorks, ignore()),
+        afterMap(async (source, destination) => {
+          const completedWorks = await source.completedWorks;
+          destination.completedWorks = mapper.mapArray(
+            completedWorks,
+            CompletedWorkEntity,
+            CompletedWorkViewModel,
+          );
+        }),
       );
     };
   }
