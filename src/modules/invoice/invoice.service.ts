@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { writeFile } from 'fs-extra';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as moment from 'moment';
 import { PaymentEntity } from '../../database/entity/payment.entity';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
@@ -35,6 +35,8 @@ export class InvoiceService {
     private readonly pdfGeneratorService: PdfGeneratorService,
     private readonly htmlTemplatesReader: HtmlTemplatesReader,
     private readonly filePathHelper: FilePathHelper,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
   async generateAsync(
@@ -56,38 +58,60 @@ export class InvoiceService {
     invoice.senderOrganizationName = generateInvoiceDto.organization;
     invoice.payment = Promise.resolve(payment);
 
-    const invoiceCreated = await this.invoiceEntityRepository.save(invoice);
+    // TODO:
+    const queryRunner = this.entityManager.connection.createQueryRunner();
 
-    const invoiceData = await this.invoiceCreateAsync(
-      generateInvoiceDto,
-      payment,
-      invoiceCreated,
-    );
+    await queryRunner.connect();
 
-    const pdfFilePath = this.filePathHelper.pdfFilePathGeneration(
-      invoiceData.invoiceNumber,
-    );
+    await queryRunner.startTransaction();
 
-    const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
+    const invoiceCreated = await queryRunner.manager.save(invoice);
 
-    const htmlTemplate: string =
-      await this.htmlTemplatesReader.compiledHtmlTemplateASync(
-        templatePath,
-        invoiceData,
+    try {
+      const invoiceData = await this.invoiceCreateAsync(
+        generateInvoiceDto,
+        payment,
+        invoiceCreated,
       );
 
-    this.pdfGeneratorService
-      .generatePdfFromTemplate(htmlTemplate)
-      .subscribe(async (pdfBuffer: Buffer) => {
-        await writeFile(pdfFilePath, pdfBuffer);
-      });
+      const pdfFilePath = this.filePathHelper.pdfFilePathGeneration(
+        invoiceData.invoiceNumber,
+      );
 
-    writeFile(
-      `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
-      htmlTemplate,
-    );
+      const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
 
-    return this.mapper.map(invoiceData, InvoiceFileViewModel, InvoiceViewModel);
+      const htmlTemplate: string =
+        await this.htmlTemplatesReader.compiledHtmlTemplateASync(
+          templatePath,
+          invoiceData,
+        );
+
+      this.pdfGeneratorService
+        .generatePdfFromTemplate(htmlTemplate)
+        .subscribe(async (pdfBuffer: Buffer) => {
+          await writeFile(pdfFilePath, pdfBuffer);
+        });
+
+      writeFile(
+        `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
+        htmlTemplate,
+      );
+
+      const invoiceView = this.mapper.map(
+        invoiceData,
+        InvoiceFileViewModel,
+        InvoiceViewModel,
+      );
+      await queryRunner.commitTransaction();
+      console.log('commitTransaction');
+      return invoiceView;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      console.log('rollbackTransaction');
+    } finally {
+      await queryRunner.release();
+      console.log('release');
+    }
   }
 
   private async invoiceCreateAsync(
