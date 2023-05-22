@@ -1,16 +1,18 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { AutoMap } from '@automapper/classes';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { CompletedWorkEntity } from './completed-work.entity';
 import { ClientEntity } from './client.entity';
+import { InvoiceEntity } from './invoice.entity';
+import { AutoMap } from '@automapper/classes';
 
 @Entity({ name: 'payments' })
 export class PaymentEntity extends BaseEntity {
-  @Column({ unique: true, generated: 'increment', nullable: false })
+  @Column({ type: 'timestamptz' })
+  @CreateDateColumn()
   @AutoMap()
-  invoiceNumber: number;
+  requestDate: Date;
 
-  @OneToMany(() => CompletedWorkEntity, (entity) => entity.invoice, {
+  @OneToMany(() => CompletedWorkEntity, (entity) => entity.payment, {
     cascade: true,
     onDelete: 'SET NULL',
   })
@@ -21,4 +23,9 @@ export class PaymentEntity extends BaseEntity {
     cascade: true,
   })
   client: Promise<ClientEntity>;
+
+  @OneToOne(() => InvoiceEntity, (entity) => entity.payment, {
+    onDelete: 'SET NULL',
+  })
+  invoice: Promise<InvoiceEntity>;
 }

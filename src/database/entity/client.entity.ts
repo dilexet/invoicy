@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 import { BaseEntity } from './base.entity';
 import { CompanyEntity } from './company.entity';
-import { PaymentEntity } from './paymentEntity';
+import { PaymentEntity } from './payment.entity';
 
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity {

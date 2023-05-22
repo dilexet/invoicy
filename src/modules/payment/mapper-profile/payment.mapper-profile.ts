@@ -5,11 +5,12 @@ import {
   createMap,
   forMember,
   ignore,
+  mapFrom,
   Mapper,
   MappingProfile,
 } from '@automapper/core';
 import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
-import { PaymentEntity } from '../../../database/entity/paymentEntity';
+import { PaymentEntity } from '../../../database/entity/payment.entity';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { CompletedWorkDto } from '../dto/completed-work.dto';
 import { CompletedWorkViewModel } from '../view-model/completed-work.view-model';
@@ -46,8 +47,14 @@ export class PaymentMapperProfile extends AutomapperProfile {
         PaymentEntity,
         PaymentViewModel,
         forMember((dest) => dest.completedWorks, ignore()),
+        forMember(
+          (dest) => dest.requestDate,
+          mapFrom((source) => source.requestDate.toUTCString()),
+        ),
         afterMap(async (source, destination) => {
           const completedWorks = await source.completedWorks;
+          const client = await source.client;
+          destination.email = client.email;
           destination.completedWorks = mapper.mapArray(
             completedWorks,
             CompletedWorkEntity,

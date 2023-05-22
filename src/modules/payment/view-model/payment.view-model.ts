@@ -9,11 +9,11 @@ export class PaymentViewModel {
 
   @ApiProperty()
   @AutoMap()
-  invoiceNumber: number;
+  email: string;
 
   @ApiProperty()
   @AutoMap()
-  email: string;
+  requestDate: string;
 
   @ApiProperty()
   completedWorks: CompletedWorkViewModel[];

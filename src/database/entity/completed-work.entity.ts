@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { PaymentEntity } from './paymentEntity';
+import { PaymentEntity } from './payment.entity';
 import { AutoMap } from '@automapper/classes';
 
 @Entity({ name: 'completed_works' })
@@ -16,5 +16,5 @@ export class CompletedWorkEntity extends BaseEntity {
   @ManyToOne(() => PaymentEntity, (entity) => entity.completedWorks, {
     onDelete: 'CASCADE',
   })
-  invoice: Promise<PaymentEntity>;
+  payment: Promise<PaymentEntity>;
 }

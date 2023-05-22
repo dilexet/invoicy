@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { writeFile } from 'fs-extra';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
-import { PaymentEntity } from '../../database/entity/paymentEntity';
+import { PaymentEntity } from '../../database/entity/payment.entity';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
 import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
@@ -19,6 +19,8 @@ import { CompanyEntity } from '../../database/entity/company.entity';
 import { CompanyViewModel } from '../company-management/view-model/company.view-model';
 import { CompletedWorkEntity } from '../../database/entity/completed-work.entity';
 import { CompletedWorkViewModel } from '../payment/view-model/completed-work.view-model';
+import { InvoiceEntity } from '../../database/entity/invoice.entity';
+import { InvoiceViewModel } from './view-model/invoice.view-model';
 
 @Injectable()
 export class InvoiceService {
@@ -28,12 +30,16 @@ export class InvoiceService {
     private readonly config: ConfigService,
     @InjectRepository(PaymentEntity)
     private paymentEntityRepository: Repository<PaymentEntity>,
+    @InjectRepository(InvoiceEntity)
+    private invoiceEntityRepository: Repository<InvoiceEntity>,
     private readonly pdfGeneratorService: PdfGeneratorService,
     private readonly htmlTemplatesReader: HtmlTemplatesReader,
     private readonly filePathHelper: FilePathHelper,
   ) {}
 
-  async generateAsync(generateInvoiceDto: GenerateInvoiceDto) {
+  async generateAsync(
+    generateInvoiceDto: GenerateInvoiceDto,
+  ): Promise<InvoiceViewModel> {
     const payment = await this.paymentEntityRepository.findOne({
       where: { id: generateInvoiceDto.paymentId },
       relations: { client: { company: true }, completedWorks: true },
@@ -43,9 +49,19 @@ export class InvoiceService {
       throw new NotFoundException('Payment not find');
     }
 
-    const invoiceData = await this.invoiceFileDataCreateAsync(
+    const completedWorks = await payment.completedWorks;
+
+    const invoice = new InvoiceEntity();
+    invoice.totalPrice = this.calculateTotalPrice(completedWorks);
+    invoice.senderOrganizationName = generateInvoiceDto.organization;
+    invoice.payment = Promise.resolve(payment);
+
+    const invoiceCreated = await this.invoiceEntityRepository.save(invoice);
+
+    const invoiceData = await this.invoiceCreateAsync(
       generateInvoiceDto,
       payment,
+      invoiceCreated,
     );
 
     const pdfFilePath = this.filePathHelper.pdfFilePathGeneration(
@@ -71,12 +87,13 @@ export class InvoiceService {
       htmlTemplate,
     );
 
-    return 'PDF generated successfully!';
+    return this.mapper.map(invoiceData, InvoiceFileViewModel, InvoiceViewModel);
   }
 
-  private async invoiceFileDataCreateAsync(
+  private async invoiceCreateAsync(
     generateInvoiceDto: GenerateInvoiceDto,
     payment: PaymentEntity,
+    invoice: InvoiceEntity,
   ): Promise<InvoiceFileViewModel> {
     const client = await payment.client;
     const company = await client.company;
@@ -97,16 +114,17 @@ export class InvoiceService {
       CompletedWorkViewModel,
     );
 
-    invoiceData.totalPrice = completedWorks
-      .reduce(
-        (totalPrice, completedWork) => totalPrice + +completedWork.price,
-        0,
-      )
-      .toFixed(2);
-    invoiceData.invoiceNumber = payment.invoiceNumber;
+    invoiceData.totalPrice = invoice.totalPrice.toFixed(2);
+
+    invoiceData.invoiceNumber = invoice.invoiceNumber;
 
     const invoiceDateFormat = this.config.get<string>('INVOICE_DATE_FORMAT');
-    invoiceData.invoiceDate = moment().format(invoiceDateFormat);
+    invoiceData.invoiceDate = moment(invoice.invoiceDate).format(
+      invoiceDateFormat,
+    );
+    invoiceData.requestDate = moment(payment.requestDate).format(
+      invoiceDateFormat,
+    );
     invoiceData.sender = this.mapper.map(
       generateInvoiceDto,
       GenerateInvoiceDto,
@@ -114,5 +132,12 @@ export class InvoiceService {
     );
 
     return invoiceData;
+  }
+
+  private calculateTotalPrice(completedWorks: CompletedWorkEntity[]): number {
+    return completedWorks.reduce(
+      (totalPrice, completedWork) => totalPrice + +completedWork.price,
+      0,
+    );
   }
 }
