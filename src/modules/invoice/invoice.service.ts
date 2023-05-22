@@ -58,7 +58,6 @@ export class InvoiceService {
     invoice.senderOrganizationName = generateInvoiceDto.organization;
     invoice.payment = Promise.resolve(payment);
 
-    // TODO:
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
     await queryRunner.connect();
