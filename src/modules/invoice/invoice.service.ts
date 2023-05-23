@@ -6,13 +6,9 @@ import { ConfigService } from '@nestjs/config';
 import { writeFile } from 'fs-extra';
 import { EntityManager, Repository } from 'typeorm';
 import * as moment from 'moment';
-import { PaymentEntity } from '../../database/entity/payment.entity';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
 import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
-import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { FilePathHelper } from '../../utils/file-path-helper';
-import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
-import { SenderViewModel } from './view-model/sender.view-model';
 import { ClientEntity } from '../../database/entity/client.entity';
 import { ClientViewModel } from '../client-management/view-model/client.view-model';
 import { CompanyEntity } from '../../database/entity/company.entity';
@@ -21,6 +17,10 @@ import { CompletedWorkEntity } from '../../database/entity/completed-work.entity
 import { CompletedWorkViewModel } from '../payment/view-model/completed-work.view-model';
 import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { InvoiceViewModel } from './view-model/invoice.view-model';
+import { PaymentEntity } from '../../database/entity/payment.entity';
+import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
+import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
+import { SenderViewModel } from './view-model/sender.view-model';
 
 @Injectable()
 export class InvoiceService {
@@ -73,7 +73,7 @@ export class InvoiceService {
         invoiceCreated,
       );
 
-      const pdfFilePath = this.filePathHelper.pdfFilePathGeneration(
+      const fileInfoModel = this.filePathHelper.pdfFilePathGeneration(
         invoiceData.invoiceNumber,
       );
 
@@ -88,7 +88,7 @@ export class InvoiceService {
       this.pdfGeneratorService
         .generatePdfFromTemplate(htmlTemplate)
         .subscribe(async (pdfBuffer: Buffer) => {
-          await writeFile(pdfFilePath, pdfBuffer);
+          await writeFile(fileInfoModel.filePath, pdfBuffer);
         });
 
       writeFile(
