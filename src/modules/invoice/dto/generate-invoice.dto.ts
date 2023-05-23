@@ -1,8 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsPhoneNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { AutoMap } from '@automapper/classes';
 
 export class GenerateInvoiceDto {
+  @ApiProperty({
+    type: String,
+    default: 'twelvedevs@gmail.com',
+    description: 'Sender email',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  @AutoMap()
+  email: string;
+
   @ApiProperty({
     type: String,
     default: 'Twelvedevs',
