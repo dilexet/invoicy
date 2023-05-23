@@ -118,11 +118,6 @@ export class InvoiceService {
       .subscribe(async (pdfBuffer: Buffer) => {
         await writeFile(fileInfoModel.filePath, pdfBuffer);
       });
-
-    writeFile(
-      `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
-      htmlTemplate,
-    );
   }
 
   private async invoiceCreateAsync(

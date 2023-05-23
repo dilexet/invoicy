@@ -28,12 +28,19 @@ export class MailService {
     const payment = await invoice.payment;
     const sender = await invoice.sender;
     const client = await payment.client;
+    const company = await client.company;
 
     const fileInfo = this.filePathHelper.pdfFilePathGeneration(
       invoice.invoiceNumber,
     );
 
-    await this.mailSender.sendInvoiceAsync(invoice, sender, client, fileInfo);
+    await this.mailSender.sendInvoiceAsync(
+      invoice,
+      sender,
+      client,
+      company,
+      fileInfo,
+    );
 
     return sendMailDto;
   }
