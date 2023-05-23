@@ -82,28 +82,7 @@ export class InvoiceService {
         invoiceCreated,
       );
 
-      const fileInfoModel = this.filePathHelper.pdfFilePathGeneration(
-        invoiceData.invoiceNumber,
-      );
-
-      const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
-
-      const htmlTemplate: string =
-        await this.htmlTemplatesReader.compiledHtmlTemplateASync(
-          templatePath,
-          invoiceData,
-        );
-
-      this.pdfGeneratorService
-        .generatePdfFromTemplate(htmlTemplate)
-        .subscribe(async (pdfBuffer: Buffer) => {
-          await writeFile(fileInfoModel.filePath, pdfBuffer);
-        });
-
-      writeFile(
-        `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
-        htmlTemplate,
-      );
+      await this.generateInvoice(invoiceData);
 
       const invoiceView = this.mapper.map(
         invoiceData,
@@ -117,6 +96,33 @@ export class InvoiceService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private async generateInvoice(
+    invoiceData: InvoiceFileViewModel,
+  ): Promise<void> {
+    const fileInfoModel = this.filePathHelper.pdfFilePathGeneration(
+      invoiceData.invoiceNumber,
+    );
+
+    const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
+
+    const htmlTemplate: string =
+      await this.htmlTemplatesReader.compiledHtmlTemplateASync(
+        templatePath,
+        invoiceData,
+      );
+
+    this.pdfGeneratorService
+      .generatePdfFromTemplate(htmlTemplate)
+      .subscribe(async (pdfBuffer: Buffer) => {
+        await writeFile(fileInfoModel.filePath, pdfBuffer);
+      });
+
+    writeFile(
+      `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
+      htmlTemplate,
+    );
   }
 
   private async invoiceCreateAsync(
