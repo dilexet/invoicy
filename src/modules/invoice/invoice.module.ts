@@ -2,13 +2,22 @@ import { Module } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { InvoiceController } from './invoice.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
+import { PaymentEntity } from '../../database/entity/payment.entity';
+import { PdfGeneratorService } from '../../utils/pdf-generator.service';
+import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
+import { FilePathHelper } from '../../utils/file-path-helper';
 import { InvoiceMapperProfile } from './mapper-profile/invoice.mapper-profile';
-import { CompletedWorkEntity } from '../../database/entity/completed-work.entity';
+import { InvoiceEntity } from '../../database/entity/invoice.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InvoiceEntity, CompletedWorkEntity])],
+  imports: [TypeOrmModule.forFeature([PaymentEntity, InvoiceEntity])],
   controllers: [InvoiceController],
-  providers: [InvoiceService, InvoiceMapperProfile],
+  providers: [
+    InvoiceService,
+    PdfGeneratorService,
+    HtmlTemplatesReader,
+    FilePathHelper,
+    InvoiceMapperProfile
+  ],
 })
 export class InvoiceModule {}

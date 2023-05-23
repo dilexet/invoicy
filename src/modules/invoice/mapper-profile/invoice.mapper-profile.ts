@@ -7,12 +7,10 @@ import {
   Mapper,
   MappingProfile,
 } from '@automapper/core';
-import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
-import { InvoiceEntity } from '../../../database/entity/invoice.entity';
-import { CreateInvoiceDto } from '../dto/create-invoice.dto';
-import { CompletedWorkDto } from '../dto/completed-work.dto';
-import { CompletedWorkViewModel } from '../view-model/completed-work.view-model';
+import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
+import { SenderViewModel } from '../view-model/sender.view-model';
 import { InvoiceViewModel } from '../view-model/invoice.view-model';
+import { InvoiceFileViewModel } from '../view-model/invoice-file.view-model';
 
 @Injectable()
 export class InvoiceMapperProfile extends AutomapperProfile {
@@ -22,37 +20,18 @@ export class InvoiceMapperProfile extends AutomapperProfile {
 
   override get profile(): MappingProfile {
     return (mapper) => {
-      createMap(mapper, CompletedWorkDto, CompletedWorkEntity);
+      createMap(mapper, GenerateInvoiceDto, SenderViewModel);
       createMap(
         mapper,
-        CreateInvoiceDto,
-        InvoiceEntity,
-        forMember(
-          (dest) => dest.completedWorks,
-          mapFrom((source) =>
-            mapper.mapArray(
-              source.completedWorks,
-              CompletedWorkDto,
-              CompletedWorkEntity,
-            ),
-          ),
-        ),
-      );
-
-      createMap(mapper, CompletedWorkEntity, CompletedWorkViewModel);
-      createMap(
-        mapper,
-        InvoiceEntity,
+        InvoiceFileViewModel,
         InvoiceViewModel,
         forMember(
-          (dest) => dest.completedWorks,
-          mapFrom((source) =>
-            mapper.mapArray(
-              source.completedWorks,
-              CompletedWorkEntity,
-              CompletedWorkViewModel,
-            ),
-          ),
+          (dest) => dest.clientEmail,
+          mapFrom((source) => source.client.email),
+        ),
+        forMember(
+          (dest) => dest.senderOrganizationName,
+          mapFrom((source) => source.sender.organization),
         ),
       );
     };

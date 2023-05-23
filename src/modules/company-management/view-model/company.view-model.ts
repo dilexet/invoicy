@@ -4,6 +4,10 @@ import { AutoMap } from '@automapper/classes';
 export class CompanyViewModel {
   @ApiProperty()
   @AutoMap()
+  id: string;
+
+  @ApiProperty()
+  @AutoMap()
   name: string;
 
   @ApiProperty()

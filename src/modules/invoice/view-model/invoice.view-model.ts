@@ -1,6 +1,5 @@
-import { CompletedWorkViewModel } from './completed-work.view-model';
-import { AutoMap } from '@automapper/classes';
 import { ApiProperty } from '@nestjs/swagger';
+import { AutoMap } from '@automapper/classes';
 
 export class InvoiceViewModel {
   @ApiProperty()
@@ -9,8 +8,19 @@ export class InvoiceViewModel {
 
   @ApiProperty()
   @AutoMap()
-  email: string;
+  totalPrice: string;
 
   @ApiProperty()
-  completedWorks: CompletedWorkViewModel[];
+  @AutoMap()
+  invoiceDate: string;
+
+  @ApiProperty()
+  @AutoMap()
+  requestDate: string;
+
+  @ApiProperty()
+  clientEmail: string;
+
+  @ApiProperty()
+  senderOrganizationName: string;
 }

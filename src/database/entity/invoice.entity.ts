@@ -1,7 +1,7 @@
-import { Column, Entity, OneToMany } from 'typeorm';
-import { BaseEntity } from './base.entity';
-import { CompletedWorkEntity } from './completed-work.entity';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
+import { BaseEntity } from './base.entity';
+import { PaymentEntity } from './payment.entity';
 
 @Entity({ name: 'invoices' })
 export class InvoiceEntity extends BaseEntity {
@@ -9,13 +9,24 @@ export class InvoiceEntity extends BaseEntity {
   @AutoMap()
   invoiceNumber: number;
 
+  // TODO: create separate table ?
   @Column({ nullable: false })
   @AutoMap()
-  email: string;
+  senderOrganizationName: string;
 
-  @OneToMany(() => CompletedWorkEntity, (entity) => entity.invoice, {
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @AutoMap()
+  totalPrice: number;
+
+  @Column({ type: 'timestamptz' })
+  @CreateDateColumn()
+  @AutoMap()
+  invoiceDate: Date;
+
+  @OneToOne(() => PaymentEntity, (entity) => entity.invoice, {
+    onDelete: 'CASCADE',
     cascade: true,
-    onDelete: 'SET NULL',
   })
-  completedWorks: CompletedWorkEntity[];
+  @JoinColumn()
+  payment: Promise<PaymentEntity>;
 }

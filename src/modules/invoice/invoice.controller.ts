@@ -6,9 +6,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { InvoiceService } from './invoice.service';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { InvoiceViewModel } from './view-model/invoice.view-model';
+import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { ExceptionModel } from '../../model/exception.model';
+import { InvoiceViewModel } from './view-model/invoice.view-model';
 
 @ApiTags('Invoice')
 @Controller('api/invoice')
@@ -17,19 +17,19 @@ export class InvoiceController {
 
   @Post()
   @ApiBody({
-    type: CreateInvoiceDto,
+    type: GenerateInvoiceDto,
   })
   @ApiCreatedResponse({
-    description: 'The invoice has been successfully created.',
+    description: 'The invoice has been successfully generated.',
     type: InvoiceViewModel,
   })
   @ApiBadRequestResponse({
-    description: 'The invoice was not created.',
+    description: 'The invoice was not generate.',
     type: ExceptionModel,
   })
-  async create(
-    @Body() createInvoiceDto: CreateInvoiceDto,
+  async generate(
+    @Body() generateInvoiceDto: GenerateInvoiceDto,
   ): Promise<InvoiceViewModel> {
-    return await this.invoiceService.createAsync(createInvoiceDto);
+    return await this.invoiceService.generateAsync(generateInvoiceDto);
   }
 }
