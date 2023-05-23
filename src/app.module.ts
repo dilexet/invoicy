@@ -8,6 +8,7 @@ import { AutomapperModule } from '@automapper/nestjs';
 import { ClientManagementModule } from './modules/client-management/client-management.module';
 import { CompanyManagementModule } from './modules/company-management/company-management.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
     ClientManagementModule,
     CompanyManagementModule,
     InvoiceModule,
+    MailModule,
   ],
 })
 export class AppModule {}
