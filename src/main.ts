@@ -21,7 +21,6 @@ async function bootstrap() {
 
   await app.listen(
     config.get<number>('PORT'),
-    config.get<string>('HOST'),
     () => {
       console.log(
         `Server started on http://${config.get<string>(
