@@ -6,13 +6,9 @@ import { ConfigService } from '@nestjs/config';
 import { writeFile } from 'fs-extra';
 import { EntityManager, Repository } from 'typeorm';
 import * as moment from 'moment';
-import { PaymentEntity } from '../../database/entity/payment.entity';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
 import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
-import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { FilePathHelper } from '../../utils/file-path-helper';
-import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
-import { SenderViewModel } from './view-model/sender.view-model';
 import { ClientEntity } from '../../database/entity/client.entity';
 import { ClientViewModel } from '../client-management/view-model/client.view-model';
 import { CompanyEntity } from '../../database/entity/company.entity';
@@ -21,6 +17,11 @@ import { CompletedWorkEntity } from '../../database/entity/completed-work.entity
 import { CompletedWorkViewModel } from '../payment/view-model/completed-work.view-model';
 import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { InvoiceViewModel } from './view-model/invoice.view-model';
+import { PaymentEntity } from '../../database/entity/payment.entity';
+import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
+import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
+import { SenderViewModel } from './view-model/sender.view-model';
+import { SenderEntity } from '../../database/entity/sender.entity';
 
 @Injectable()
 export class InvoiceService {
@@ -48,14 +49,22 @@ export class InvoiceService {
     });
 
     if (!payment) {
-      throw new NotFoundException('Payment not find');
+      throw new NotFoundException('Payment not found');
     }
 
     const completedWorks = await payment.completedWorks;
 
     const invoice = new InvoiceEntity();
     invoice.totalPrice = this.calculateTotalPrice(completedWorks);
-    invoice.senderOrganizationName = generateInvoiceDto.organization;
+
+    const senderEntity = this.mapper.map(
+      generateInvoiceDto,
+      GenerateInvoiceDto,
+      SenderEntity,
+    );
+
+    invoice.sender = Promise.resolve(senderEntity);
+
     invoice.payment = Promise.resolve(payment);
 
     const queryRunner = this.entityManager.connection.createQueryRunner();
@@ -73,28 +82,7 @@ export class InvoiceService {
         invoiceCreated,
       );
 
-      const pdfFilePath = this.filePathHelper.pdfFilePathGeneration(
-        invoiceData.invoiceNumber,
-      );
-
-      const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
-
-      const htmlTemplate: string =
-        await this.htmlTemplatesReader.compiledHtmlTemplateASync(
-          templatePath,
-          invoiceData,
-        );
-
-      this.pdfGeneratorService
-        .generatePdfFromTemplate(htmlTemplate)
-        .subscribe(async (pdfBuffer: Buffer) => {
-          await writeFile(pdfFilePath, pdfBuffer);
-        });
-
-      writeFile(
-        `${this.config.get<string>('PDF_FILES_PATH')}/output-template.html`,
-        htmlTemplate,
-      );
+      await this.generateInvoice(invoiceData);
 
       const invoiceView = this.mapper.map(
         invoiceData,
@@ -102,15 +90,34 @@ export class InvoiceService {
         InvoiceViewModel,
       );
       await queryRunner.commitTransaction();
-      console.log('commitTransaction');
       return invoiceView;
     } catch (err) {
       await queryRunner.rollbackTransaction();
-      console.log('rollbackTransaction');
     } finally {
       await queryRunner.release();
-      console.log('release');
     }
+  }
+
+  private async generateInvoice(
+    invoiceData: InvoiceFileViewModel,
+  ): Promise<void> {
+    const fileInfoModel = this.filePathHelper.pdfFilePathGeneration(
+      invoiceData.invoiceNumber,
+    );
+
+    const templatePath = this.config.get<string>('INVOICE_TEMPLATE_PATH');
+
+    const htmlTemplate: string =
+      await this.htmlTemplatesReader.compiledHtmlTemplateASync(
+        templatePath,
+        invoiceData,
+      );
+
+    this.pdfGeneratorService
+      .generatePdfFromTemplate(htmlTemplate)
+      .subscribe(async (pdfBuffer: Buffer) => {
+        await writeFile(fileInfoModel.filePath, pdfBuffer);
+      });
   }
 
   private async invoiceCreateAsync(
