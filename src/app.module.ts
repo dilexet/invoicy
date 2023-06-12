@@ -13,6 +13,7 @@ import { CompanyManagementModule } from './modules/company-management/company-ma
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { MailModule } from './modules/mail/mail.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -36,6 +37,15 @@ import { PaymentModule } from './modules/payment/payment.module';
           strict: true,
         },
       },
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'pdf-generator',
     }),
     PaymentModule,
     ClientManagementModule,
