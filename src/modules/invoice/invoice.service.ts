@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 import { writeFile } from 'fs-extra';
 import { EntityManager, Repository } from 'typeorm';
 import * as moment from 'moment';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
 import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
 import { FilePathHelper } from '../../utils/file-path-helper';
@@ -22,6 +24,8 @@ import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
 import { SenderViewModel } from './view-model/sender.view-model';
 import { SenderEntity } from '../../database/entity/sender.entity';
+import { MAIL_SENDER_QUEUE_NAME } from '../../constants/queue.constants';
+import { SendMailDto } from '../mail/dto/send-mail.dto';
 
 @Injectable()
 export class InvoiceService {
@@ -38,6 +42,8 @@ export class InvoiceService {
     private readonly filePathHelper: FilePathHelper,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
+    @InjectQueue(MAIL_SENDER_QUEUE_NAME)
+    private mailSenderQueue: Queue,
   ) {}
 
   async generateAsync(
@@ -89,6 +95,10 @@ export class InvoiceService {
         InvoiceFileViewModel,
         InvoiceViewModel,
       );
+
+      const sendMailDto = new SendMailDto();
+      sendMailDto.invoiceId = invoiceCreated.id;
+      await this.mailSenderQueue.add(sendMailDto);
       await queryRunner.commitTransaction();
       return invoiceView;
     } catch (err) {
@@ -113,11 +123,10 @@ export class InvoiceService {
         invoiceData,
       );
 
-    this.pdfGeneratorService
-      .generatePdfFromTemplate(htmlTemplate)
-      .subscribe(async (pdfBuffer: Buffer) => {
-        await writeFile(fileInfoModel.filePath, pdfBuffer);
-      });
+    await writeFile(
+      fileInfoModel.filePath,
+      await this.pdfGeneratorService.generatePdfFromTemplate(htmlTemplate),
+    );
   }
 
   private async invoiceCreateAsync(

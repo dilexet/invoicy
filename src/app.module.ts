@@ -1,5 +1,4 @@
 import { join } from 'path';
-import * as process from 'process';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +10,6 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { ClientManagementModule } from './modules/client-management/client-management.module';
 import { CompanyManagementModule } from './modules/company-management/company-management.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
-import { MailModule } from './modules/mail/mail.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { BullModule } from '@nestjs/bull';
 
@@ -44,14 +42,11 @@ import { BullModule } from '@nestjs/bull';
         port: +process.env.REDIS_PORT,
       },
     }),
-    BullModule.registerQueue({
-      name: 'pdf-generator',
-    }),
+
     PaymentModule,
     ClientManagementModule,
     CompanyManagementModule,
     InvoiceModule,
-    MailModule,
   ],
 })
 export class AppModule {}

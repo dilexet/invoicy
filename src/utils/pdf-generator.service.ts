@@ -1,29 +1,22 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { File, generatePdf, Options } from 'html-pdf-node';
 
 @Injectable()
 export class PdfGeneratorService {
-  generatePdfFromTemplate(template:string): Observable<Buffer> {
+  generatePdfFromTemplate(template: string): Promise<Buffer> {
     const file: File = { content: template };
     const options: Options = { format: 'A4' };
 
-    return new Observable<Buffer>((observer) => {
+    return new Promise((resolve, reject) => {
       generatePdf(file, options, (err, buffer) => {
         if (err) {
-          observer.error(
+          reject(
             new InternalServerErrorException('Error while generating pdf'),
           );
         } else {
-          observer.next(buffer);
-          observer.complete();
+          resolve(buffer);
         }
       });
-    }).pipe(
-      catchError((err) => {
-        throw new InternalServerErrorException(err);
-      }),
-    );
+    });
   }
 }
