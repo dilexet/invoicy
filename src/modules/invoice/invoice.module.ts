@@ -10,17 +10,27 @@ import { FilePathHelper } from '../../utils/file-path-helper';
 import { InvoiceMapperProfile } from './mapper-profile/invoice.mapper-profile';
 import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { SenderEntity } from '../../database/entity/sender.entity';
-import { InvoiceConsumer } from './invoice.consumer';
-import { MAIL_SENDER_QUEUE_NAME } from '../../constants/queue.constants';
+import { MailConsumer } from '../mail/mail.consumer';
+import {
+  INVOICE_GENERATE_QUEUE_NAME,
+  MAIL_SENDER_QUEUE_NAME,
+} from '../../constants/queue.constants';
 import { MailService } from '../mail/mail.service';
 import { MailSender } from '../../utils/mail-sender';
+import { InvoiceHelpers } from './utils/invoice.helpers';
+import { InvoiceConsumer } from './invoice.consumer';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PaymentEntity, InvoiceEntity, SenderEntity]),
-    BullModule.registerQueue({
-      name: MAIL_SENDER_QUEUE_NAME,
-    }),
+    BullModule.registerQueue(
+      {
+        name: MAIL_SENDER_QUEUE_NAME,
+      },
+      {
+        name: INVOICE_GENERATE_QUEUE_NAME,
+      },
+    ),
   ],
   controllers: [InvoiceController],
   providers: [
@@ -28,7 +38,9 @@ import { MailSender } from '../../utils/mail-sender';
     PdfGeneratorService,
     HtmlTemplatesReader,
     FilePathHelper,
+    InvoiceHelpers,
     InvoiceMapperProfile,
+    MailConsumer,
     InvoiceConsumer,
     MailService,
     FilePathHelper,

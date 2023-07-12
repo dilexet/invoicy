@@ -5,7 +5,8 @@
   "compilerOptions": {
     "assets": [
       "**/*.hbs",
-      "**/*.env"
+      "**/*.env",
+      "**/*.html"
     ],
     "watchAssets": true,
     "deleteOutDir": true
