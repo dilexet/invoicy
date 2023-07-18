@@ -17,6 +17,7 @@ import {
   MAIL_SENDER_QUEUE_NAME,
 } from '../../constants/queue.constants';
 import { InvoiceHelpers } from './utils/invoice.helpers';
+import { MailInfoDto } from '../mail/mail-info.dto';
 
 @Injectable()
 export class InvoiceService {
@@ -82,7 +83,10 @@ export class InvoiceService {
 
       await this.invoiceGenerationQueue.add(invoiceData);
 
-      await this.mailSenderQueue.add(invoiceCreated.id);
+      const mailInfoDto = new MailInfoDto();
+      mailInfoDto.invoiceId = invoiceCreated.id;
+
+      await this.mailSenderQueue.add(mailInfoDto);
 
       await queryRunner.commitTransaction();
 

@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { FilePathHelper } from '../../utils/file-path-helper';
 import { MailSender } from '../../utils/mail-sender';
+import { MailInfoDto } from './mail-info.dto';
 
 @Injectable()
 export class MailService {
@@ -17,10 +18,10 @@ export class MailService {
     private mailSender: MailSender,
   ) {}
 
-  async sendMailAsync(invoiceId: string): Promise<boolean> {
+  async sendMailAsync(mailInfoDto: MailInfoDto): Promise<boolean> {
     const invoice = await this.invoiceEntityRepository.findOne({
       where: {
-        id: invoiceId,
+        id: mailInfoDto.invoiceId,
       },
     });
 
