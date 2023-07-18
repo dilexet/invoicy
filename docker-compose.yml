@@ -1,5 +1,6 @@
 version: "3"
 services:
+
   api_dev:
     container_name: invoicy_api_dev
     image: invoicy-api-dev:1.0.0
@@ -19,6 +20,7 @@ services:
     depends_on:
       - postgres
       - redis
+
   postgres:
     container_name: postgres_db
     image: postgres:latest
@@ -35,16 +37,21 @@ services:
       - ./docker/postgres-data:/var/lib/postgresql/data
     env_file:
       - ./.env.docker
+
   redis:
     container_name: redis
     image: redis:latest
+    hostname: redis
     restart: always
     networks:
       - nestjs-network
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
     ports:
       - "6379:6379"
     volumes:
       - ./docker/redis-data:/data
+
   pgadmin:
     container_name: pgadmin4
     image: dpage/pgadmin4
@@ -60,6 +67,17 @@ services:
       - ./.env.docker
     depends_on:
       - postgres
+
+  redis-commander:
+    container_name: invoice_redis_commander
+    image: rediscommander/redis-commander
+    restart: always
+    networks:
+      - nestjs-network
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
 
 networks:
   nestjs-network:

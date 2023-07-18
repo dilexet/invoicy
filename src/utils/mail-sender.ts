@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as moment from 'moment/moment';
 import { join } from 'path';
 import { MailerService } from '@nestjs-modules/mailer';
 import { InvoiceEntity } from '../database/entity/invoice.entity';
 import { ClientEntity } from '../database/entity/client.entity';
 import { FileInfoModel } from '../model/file-info.model';
 import { SenderEntity } from '../database/entity/sender.entity';
-import * as moment from 'moment/moment';
-import { ConfigService } from '@nestjs/config';
 import { CompanyEntity } from '../database/entity/company.entity';
 
 @Injectable()
