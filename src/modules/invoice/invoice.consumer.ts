@@ -1,11 +1,12 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import { INVOICE_GENERATE_QUEUE_NAME } from '../../constants/queue.constants';
-import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
-import { writeFile } from 'fs-extra';
-import { FilePathHelper } from '../../utils/file-path-helper';
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { writeFile } from 'fs-extra';
+import { INVOICE_GENERATE_QUEUE_NAME } from '../../constants/queue.constants';
+import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
+import { FilePathHelper } from '../../utils/file-path-helper';
+import { eventManager } from '../../utils/event-manager';
 import { HtmlTemplatesReader } from '../../utils/html-templates-reader';
 import { PdfGeneratorService } from '../../utils/pdf-generator.service';
 
@@ -21,7 +22,8 @@ export class InvoiceConsumer {
 
   @Process()
   async process(job: Job<InvoiceFileViewModel>): Promise<void> {
-    return await this.generateInvoice(job.data);
+    await this.generateInvoice(job.data);
+    eventManager.emit('invoiceGenerated');
   }
 
   private async generateInvoice(
