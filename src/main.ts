@@ -19,16 +19,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup(config.get<string>('SWAGGER_PATH'), app, document);
 
-  await app.listen(
-    config.get<number>('PORT'),
-    () => {
-      console.log(
-        `Server started on http://${config.get<string>(
-          'HOST',
-        )}:${config.get<number>('PORT')}/${config.get<number>('SWAGGER_PATH')}`,
-      );
-    },
-  );
+  await app.listen(config.get<number>('PORT'), () => {
+    console.log(
+      `Server started on http://${config.get<string>(
+        'HOST',
+      )}:${config.get<number>('PORT')}/${config.get<number>('SWAGGER_PATH')}`,
+    );
+  });
 }
 
 bootstrap();

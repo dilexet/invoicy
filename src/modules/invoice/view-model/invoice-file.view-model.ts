@@ -13,7 +13,7 @@ export class InvoiceFileViewModel {
 
   @AutoMap()
   invoiceId: string;
-  
+
   @AutoMap()
   invoiceNumber: number;
 
