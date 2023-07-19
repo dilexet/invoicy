@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   JoinColumn,
   OneToOne,
 } from 'typeorm';
@@ -12,7 +13,8 @@ import { SenderEntity } from './sender.entity';
 
 @Entity({ name: 'invoices' })
 export class InvoiceEntity extends BaseEntity {
-  @Column({ unique: true, generated: 'increment', nullable: false })
+  @Column({ unique: true, nullable: false })
+  @Generated('increment')
   @AutoMap()
   invoiceNumber: number;
 
