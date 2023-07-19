@@ -1,47 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
+import { Injectable } from '@nestjs/common';
 import { FilePathHelper } from '../../utils/file-path-helper';
 import { MailSender } from '../../utils/mail-sender';
-import { MailInfoDto } from './mail-info.dto';
+import { MailDto } from './mail.dto';
 
 @Injectable()
 export class MailService {
   constructor(
-    @Inject(ConfigService)
-    private readonly config: ConfigService,
-    @InjectRepository(InvoiceEntity)
-    private invoiceEntityRepository: Repository<InvoiceEntity>,
     private filePathHelper: FilePathHelper,
     private mailSender: MailSender,
   ) {}
 
-  async sendMailAsync(mailInfoDto: MailInfoDto): Promise<boolean> {
-    const invoice = await this.invoiceEntityRepository.findOne({
-      where: {
-        id: mailInfoDto.invoiceId,
-      },
-    });
-
-    const payment = await invoice.payment;
-    const sender = await invoice.sender;
-    const client = await payment.client;
-    const company = await client.company;
-
+  async sendMailAsync(mailDto: MailDto): Promise<boolean> {
     const fileInfo = this.filePathHelper.pdfFilePathGeneration(
-      invoice.invoiceNumber,
+      mailDto.invoiceNumber,
     );
 
     try {
-      const result = await this.mailSender.sendInvoiceAsync(
-        invoice,
-        sender,
-        client,
-        company,
-        fileInfo,
-      );
+      const result = await this.mailSender.sendInvoiceAsync(mailDto, fileInfo);
 
       return !(result && result.rejected.length > 0);
     } catch (error) {

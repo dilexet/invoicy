@@ -1,11 +1,11 @@
-import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import { MAIL_SENDER_QUEUE_NAME } from '../../constants/queue.constants';
-import { MailService } from './mail.service';
-import { MailInfoDto } from './mail-info.dto';
-import { eventManager } from '../../utils/event-manager';
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Process, Processor } from '@nestjs/bull';
+import { eventManager } from '../../utils/event-manager';
+import { MAIL_SENDER_QUEUE_NAME } from '../../constants/queue.constants';
+import { MailDto } from './mail.dto';
+import { MailService } from './mail.service';
 
 @Processor(MAIL_SENDER_QUEUE_NAME)
 export class MailConsumer {
@@ -16,7 +16,7 @@ export class MailConsumer {
   ) {}
 
   @Process()
-  async process(job: Job<MailInfoDto>): Promise<boolean> {
+  async process(job: Job<MailDto>): Promise<boolean> {
     await new Promise<void>((resolve) => {
       eventManager.once(
         this.configService.get<string>('INVOICE_GENERATION_EVENT_NAME'),
