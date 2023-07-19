@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -72,21 +77,32 @@ export class InvoiceService {
 
     await queryRunner.startTransaction();
 
-    const invoiceCreated = await queryRunner.manager.save(invoice);
+    const { id: paymentId } = payment;
+
+    const invoiceExited = await this.invoiceEntityRepository.findOneBy({
+      payment: { id: paymentId },
+    });
 
     try {
-      const invoiceData = await this.invoiceHelpers.invoiceCreateAsync(
-        generateInvoiceDto,
-        payment,
-        invoiceCreated,
-      );
-
-      await this.invoiceGenerationQueue.add(invoiceData);
+      const invoiceData = !invoiceExited
+        ? await this.invoiceHelpers.invoiceCreateAsync(
+            generateInvoiceDto,
+            payment,
+            await queryRunner.manager.save(invoice),
+          )
+        : await this.invoiceHelpers.invoiceCreateAsync(
+            generateInvoiceDto,
+            payment,
+            invoiceExited,
+          );
 
       const mailInfoDto = new MailInfoDto();
-      mailInfoDto.invoiceId = invoiceCreated.id;
+      mailInfoDto.invoiceId = invoiceData.invoiceId;
 
-      await this.mailSenderQueue.add(mailInfoDto);
+      await Promise.all([
+        this.invoiceGenerationQueue.add(invoiceData),
+        this.mailSenderQueue.add(invoiceData),
+      ]);
 
       await queryRunner.commitTransaction();
 
@@ -97,6 +113,7 @@ export class InvoiceService {
       );
     } catch (err) {
       await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException('Error creating invoice');
     } finally {
       await queryRunner.release();
     }

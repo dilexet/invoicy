@@ -12,6 +12,9 @@ export class InvoiceFileViewModel {
   completedWorks: CompletedWorkViewModel[];
 
   @AutoMap()
+  invoiceId: string;
+  
+  @AutoMap()
   invoiceNumber: number;
 
   @AutoMap()

@@ -33,6 +33,7 @@ export class InvoiceHelpers {
     const completedWorks = await payment.completedWorks;
 
     const invoiceData = new InvoiceFileViewModel();
+    invoiceData.invoiceId = invoice.id;
     invoiceData.client = this.mapper.map(client, ClientEntity, ClientViewModel);
 
     invoiceData.company = this.mapper.map(
@@ -47,7 +48,7 @@ export class InvoiceHelpers {
       CompletedWorkViewModel,
     );
 
-    invoiceData.totalPrice = invoice.totalPrice.toFixed(2);
+    invoiceData.totalPrice = (+invoice.totalPrice).toFixed(2);
 
     invoiceData.invoiceNumber = invoice.invoiceNumber;
 
