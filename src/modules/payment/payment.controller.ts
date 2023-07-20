@@ -1,8 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
@@ -31,5 +33,23 @@ export class PaymentController {
     @Body() createPaymentDto: CreatePaymentDto,
   ): Promise<PaymentViewModel> {
     return await this.paymentService.createAsync(createPaymentDto);
+  }
+
+  @Get()
+  @ApiQuery({
+    name: 'payment',
+    description: 'Payment client email',
+    type: String,
+    required: false,
+  })
+  @ApiOkResponse({
+    description: 'Information about all payments was successfully received.',
+    type: PaymentViewModel,
+    isArray: true,
+  })
+  async getAll(
+    @Query('payment') payment?: string,
+  ): Promise<PaymentViewModel[]> {
+    return await this.paymentService.getAllAsync(payment);
   }
 }
