@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { ClientEntity } from '../../database/entity/client.entity';
 import { CreateClientInfoDto } from './dto/create-client-info.dto';
 import { ClientViewModel } from './view-model/client.view-model';
@@ -18,7 +18,6 @@ export class ClientManagementService {
     private companyEntityRepository: Repository<CompanyEntity>,
   ) {}
 
-  // TODO: email verify when started use mailgun
   async createAsync(
     createClientManagementDto: CreateClientInfoDto,
   ): Promise<ClientViewModel> {
@@ -53,5 +52,23 @@ export class ClientManagementService {
     );
 
     return this.mapper.map(clientEntityCreated, ClientEntity, ClientViewModel);
+  }
+
+  async getAllAsync(client?: string): Promise<ClientViewModel[]> {
+    const clients = !client
+      ? await this.clientEntityRepository.find()
+      : await this.clientEntityRepository.find({
+          where: [
+            { firstName: ILike(`%${client}%`) },
+            { lastName: ILike(`%${client}%`) },
+            { email: ILike(`%${client}%`) },
+          ],
+        });
+
+    if (clients.length <= 0) {
+      return [];
+    }
+
+    return this.mapper.mapArray(clients, ClientEntity, ClientViewModel);
   }
 }
