@@ -8,5 +8,8 @@ export class SenderViewModel {
   address: string;
 
   @AutoMap()
+  email: string;
+
+  @AutoMap()
   phone: string;
 }

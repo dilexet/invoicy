@@ -1,5 +1,5 @@
 import { InvoiceFileViewModel } from '../view-model/invoice-file.view-model';
-import { writeFile } from 'fs-extra';
+import { outputFile } from 'fs-extra';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FilePathHelper } from '../../../utils/file-path-helper';
@@ -31,7 +31,7 @@ export class InvoiceGenerator {
         invoiceData,
       );
 
-    await writeFile(
+    await outputFile(
       fileInfoModel.filePath,
       await this.pdfGeneratorService.generatePdfFromTemplate(htmlTemplate),
     );

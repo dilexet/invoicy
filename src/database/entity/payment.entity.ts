@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { CompletedWorkEntity } from './completed-work.entity';
 import { ClientEntity } from './client.entity';

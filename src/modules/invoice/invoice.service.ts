@@ -1,8 +1,11 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { ConfigService } from '@nestjs/config';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -17,14 +20,12 @@ import {
   MAIL_SENDER_QUEUE_NAME,
 } from '../../constants/queue.constants';
 import { InvoiceHelpers } from './utils/invoice.helpers';
-import { MailInfoDto } from '../mail/mail-info.dto';
+import { MailDto } from '../mail/dto/mail.dto';
 
 @Injectable()
 export class InvoiceService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    @Inject(ConfigService)
-    private readonly config: ConfigService,
     @InjectRepository(PaymentEntity)
     private paymentEntityRepository: Repository<PaymentEntity>,
     @InjectRepository(InvoiceEntity)
@@ -52,8 +53,8 @@ export class InvoiceService {
 
     const completedWorks = await payment.completedWorks;
 
-    const invoice = new InvoiceEntity();
-    invoice.totalPrice =
+    const newInvoice = new InvoiceEntity();
+    newInvoice.totalPrice =
       this.invoiceHelpers.calculateTotalPrice(completedWorks);
 
     const senderEntity = this.mapper.map(
@@ -62,9 +63,9 @@ export class InvoiceService {
       SenderEntity,
     );
 
-    invoice.sender = Promise.resolve(senderEntity);
+    newInvoice.sender = Promise.resolve(senderEntity);
 
-    invoice.payment = Promise.resolve(payment);
+    newInvoice.payment = Promise.resolve(payment);
 
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
@@ -72,21 +73,31 @@ export class InvoiceService {
 
     await queryRunner.startTransaction();
 
-    const invoiceCreated = await queryRunner.manager.save(invoice);
-
     try {
-      const invoiceData = await this.invoiceHelpers.invoiceCreateAsync(
-        generateInvoiceDto,
-        payment,
-        invoiceCreated,
+      const { id: paymentId } = payment;
+
+      const invoice =
+        (await this.invoiceEntityRepository.findOneBy({
+          payment: { id: paymentId },
+        })) ?? (await queryRunner.manager.save(newInvoice));
+
+      const invoiceData: InvoiceFileViewModel =
+        await this.invoiceHelpers.invoiceCreateAsync(
+          generateInvoiceDto,
+          payment,
+          invoice,
+        );
+
+      const mailData: MailDto = await this.mapper.mapAsync(
+        invoiceData,
+        InvoiceFileViewModel,
+        MailDto,
       );
 
-      await this.invoiceGenerationQueue.add(invoiceData);
-
-      const mailInfoDto = new MailInfoDto();
-      mailInfoDto.invoiceId = invoiceCreated.id;
-
-      await this.mailSenderQueue.add(mailInfoDto);
+      await Promise.all([
+        this.invoiceGenerationQueue.add(invoiceData),
+        this.mailSenderQueue.add(mailData),
+      ]);
 
       await queryRunner.commitTransaction();
 
@@ -97,6 +108,7 @@ export class InvoiceService {
       );
     } catch (err) {
       await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException('Error creating invoice');
     } finally {
       await queryRunner.release();
     }

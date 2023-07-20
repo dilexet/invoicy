@@ -1,47 +1,49 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
 import { FilePathHelper } from '../../utils/file-path-helper';
 import { MailSender } from '../../utils/mail-sender';
-import { MailInfoDto } from './mail-info.dto';
+import { MailDto } from './dto/mail.dto';
+import { MailInfoDto } from './dto/mail-info.dto';
+import { InjectMapper } from '@automapper/nestjs';
+import { Mapper } from '@automapper/core';
+import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
   constructor(
     @Inject(ConfigService)
-    private readonly config: ConfigService,
-    @InjectRepository(InvoiceEntity)
-    private invoiceEntityRepository: Repository<InvoiceEntity>,
+    private readonly configService: ConfigService,
+    @InjectMapper() private readonly mapper: Mapper,
     private filePathHelper: FilePathHelper,
     private mailSender: MailSender,
-  ) {}
+  ) {
+  }
 
-  async sendMailAsync(mailInfoDto: MailInfoDto): Promise<boolean> {
-    const invoice = await this.invoiceEntityRepository.findOne({
-      where: {
-        id: mailInfoDto.invoiceId,
-      },
-    });
-
-    const payment = await invoice.payment;
-    const sender = await invoice.sender;
-    const client = await payment.client;
-    const company = await client.company;
-
+  async sendMailAsync(mailDto: MailDto): Promise<boolean> {
     const fileInfo = this.filePathHelper.pdfFilePathGeneration(
-      invoice.invoiceNumber,
+      mailDto.invoiceNumber,
+    );
+
+    const mailInfo: MailInfoDto = this.mapper.map(
+      mailDto,
+      MailDto,
+      MailInfoDto,
+    );
+
+    mailInfo.attachments = [
+      {
+        path: join(process.cwd(), fileInfo.filePath),
+        filename: fileInfo.fileName,
+        contentDisposition: 'attachment',
+      },
+    ];
+
+    mailInfo.templatePath = this.configService.get<string>(
+      'INVOICE_MAIL_TEMPLATE_PATH',
     );
 
     try {
-      const result = await this.mailSender.sendInvoiceAsync(
-        invoice,
-        sender,
-        client,
-        company,
-        fileInfo,
-      );
+      const result = await this.mailSender.sendInvoiceAsync(mailInfo);
 
       return !(result && result.rejected.length > 0);
     } catch (error) {
