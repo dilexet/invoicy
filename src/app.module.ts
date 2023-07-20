@@ -12,6 +12,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { MailerConfig } from './config/mailer.config';
 import { BullConfig } from './config/bull.config';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BullConfig } from './config/bull.config';
     ClientManagementModule,
     CompanyManagementModule,
     InvoiceModule,
+    MailModule
   ],
 })
 export class AppModule {}

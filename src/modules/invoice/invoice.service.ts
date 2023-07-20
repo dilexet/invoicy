@@ -20,7 +20,7 @@ import {
   MAIL_SENDER_QUEUE_NAME,
 } from '../../constants/queue.constants';
 import { InvoiceHelpers } from './utils/invoice.helpers';
-import { MailDto } from '../mail/mail.dto';
+import { MailDto } from '../mail/dto/mail.dto';
 
 @Injectable()
 export class InvoiceService {

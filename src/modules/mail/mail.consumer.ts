@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Process, Processor } from '@nestjs/bull';
 import { eventManager } from '../../utils/event-manager';
 import { MAIL_SENDER_QUEUE_NAME } from '../../constants/queue.constants';
-import { MailDto } from './mail.dto';
+import { MailDto } from './dto/mail.dto';
 import { MailService } from './mail.service';
 
 @Processor(MAIL_SENDER_QUEUE_NAME)

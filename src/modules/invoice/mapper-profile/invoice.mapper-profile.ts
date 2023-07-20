@@ -12,7 +12,7 @@ import { SenderViewModel } from '../view-model/sender.view-model';
 import { InvoiceViewModel } from '../view-model/invoice.view-model';
 import { InvoiceFileViewModel } from '../view-model/invoice-file.view-model';
 import { SenderEntity } from '../../../database/entity/sender.entity';
-import { MailDto } from '../../mail/mail.dto';
+import { MailDto } from '../../mail/dto/mail.dto';
 
 @Injectable()
 export class InvoiceMapperProfile extends AutomapperProfile {
