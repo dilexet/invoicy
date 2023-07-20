@@ -4,13 +4,13 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentViewModel } from './view-model/payment.view-model';
 import { ExceptionModel } from '../../model/exception.model';
+import { PaymentQuery } from './dto/payment-query';
 
 @ApiTags('Payment')
 @Controller('api/payment')
@@ -36,20 +36,12 @@ export class PaymentController {
   }
 
   @Get()
-  @ApiQuery({
-    name: 'payment',
-    description: 'Payment client email',
-    type: String,
-    required: false,
-  })
   @ApiOkResponse({
     description: 'Information about all payments was successfully received.',
     type: PaymentViewModel,
     isArray: true,
   })
-  async getAll(
-    @Query('payment') payment?: string,
-  ): Promise<PaymentViewModel[]> {
+  async getAll(@Query() payment?: PaymentQuery): Promise<PaymentViewModel[]> {
     return await this.paymentService.getAllAsync(payment);
   }
 }
