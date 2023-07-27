@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentEntity } from '../../database/entity/payment.entity';
@@ -7,6 +7,7 @@ import { PaymentViewModel } from './view-model/payment.view-model';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { ClientEntity } from '../../database/entity/client.entity';
+import { PaymentQuery } from './dto/payment-query';
 
 @Injectable()
 export class PaymentService {
@@ -45,6 +46,31 @@ export class PaymentService {
       paymentEntityCreated,
       PaymentEntity,
       PaymentViewModel,
+    );
+  }
+
+  async getAllAsync(payment?: PaymentQuery): Promise<PaymentViewModel[]> {
+    const defaultSortType = 'DESC';
+    const payments = !payment?.email
+      ? await this.paymentEntityRepository.find({
+          relations: { client: true, completedWorks: true },
+          order: { requestDate: payment?.sortType ?? defaultSortType },
+        })
+      : await this.paymentEntityRepository.find({
+          where: [{ client: { email: ILike(`%${payment?.email}%`) } }],
+          relations: { client: true, completedWorks: true },
+          order: { requestDate: payment?.sortType ?? defaultSortType },
+        });
+
+    if (payments.length <= 0) {
+      return [];
+    }
+
+    return await Promise.all(
+      payments.map(
+        async (value) =>
+          await this.mapper.mapAsync(value, PaymentEntity, PaymentViewModel),
+      ),
     );
   }
 }
