@@ -9,8 +9,7 @@ import {
   Mapper,
   MappingProfile,
 } from '@automapper/core';
-import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
-import { PaymentEntity } from '../../../database/entity/payment.entity';
+import { CompletedWorkEntity, PaymentEntity } from '../../../database';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { CompletedWorkDto } from '../dto/completed-work.dto';
 import { CompletedWorkViewModel } from '../view-model/completed-work.view-model';

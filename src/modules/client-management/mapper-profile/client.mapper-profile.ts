@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
 import { createMap, Mapper, MappingProfile } from '@automapper/core';
 import { CreateClientInfoDto } from '../dto/create-client-info.dto';
-import { ClientEntity } from '../../../database/entity/client.entity';
+import { ClientEntity } from '../../../database';
 import { ClientViewModel } from '../view-model/client.view-model';
 
 @Injectable()

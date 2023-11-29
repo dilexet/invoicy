@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
-import { PaymentEntity } from '../../database/entity/payment.entity';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
-import { SenderEntity } from '../../database/entity/sender.entity';
+import { PaymentEntity, InvoiceEntity, SenderEntity } from '../../database';
 import {
   INVOICE_GENERATE_QUEUE_NAME,
   MAIL_SENDER_QUEUE_NAME,

@@ -5,7 +5,7 @@ import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { BullModule } from '@nestjs/bull';
-import { TypeOrmConfigService } from './database/typeorm-config.service';
+import { TypeOrmConfigService } from './database';
 import { ClientManagementModule } from './modules/client-management/client-management.module';
 import { CompanyManagementModule } from './modules/company-management/company-management.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
@@ -25,7 +25,7 @@ import { MailModule } from './modules/mail/mail.module';
     ClientManagementModule,
     CompanyManagementModule,
     InvoiceModule,
-    MailModule
+    MailModule,
   ],
 })
 export class AppModule {}

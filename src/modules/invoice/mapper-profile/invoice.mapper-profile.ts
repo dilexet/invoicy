@@ -11,7 +11,7 @@ import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
 import { SenderViewModel } from '../view-model/sender.view-model';
 import { InvoiceViewModel } from '../view-model/invoice.view-model';
 import { InvoiceFileViewModel } from '../view-model/invoice-file.view-model';
-import { SenderEntity } from '../../../database/entity/sender.entity';
+import { SenderEntity } from '../../../database';
 import { MailDto } from '../../mail/dto/mail.dto';
 
 @Injectable()

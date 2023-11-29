@@ -1,12 +1,11 @@
 import { ILike, Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentEntity } from '../../database/entity/payment.entity';
+import { PaymentEntity, ClientEntity } from '../../database';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentViewModel } from './view-model/payment.view-model';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
-import { ClientEntity } from '../../database/entity/client.entity';
 import { PaymentQuery } from './dto/payment-query';
 
 @Injectable()

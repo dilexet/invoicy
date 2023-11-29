@@ -1,13 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
-import { PaymentEntity } from '../../../database/entity/payment.entity';
-import { InvoiceEntity } from '../../../database/entity/invoice.entity';
+import {
+  PaymentEntity,
+  InvoiceEntity,
+  ClientEntity,
+  CompanyEntity,
+  CompletedWorkEntity,
+} from '../../../database';
 import { InvoiceFileViewModel } from '../view-model/invoice-file.view-model';
-import { ClientEntity } from '../../../database/entity/client.entity';
 import { ClientViewModel } from '../../client-management/view-model/client.view-model';
-import { CompanyEntity } from '../../../database/entity/company.entity';
 import { CompanyViewModel } from '../../company-management/view-model/company.view-model';
-import { CompletedWorkEntity } from '../../../database/entity/completed-work.entity';
 import { CompletedWorkViewModel } from '../../payment/view-model/completed-work.view-model';
 import * as moment from 'moment/moment';
 import { SenderViewModel } from '../view-model/sender.view-model';

@@ -3,10 +3,9 @@ import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { ClientEntity } from '../../database/entity/client.entity';
+import { ClientEntity, CompanyEntity } from '../../database';
 import { CreateClientInfoDto } from './dto/create-client-info.dto';
 import { ClientViewModel } from './view-model/client.view-model';
-import { CompanyEntity } from '../../database/entity/company.entity';
 
 @Injectable()
 export class ClientManagementService {

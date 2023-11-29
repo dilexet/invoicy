@@ -9,12 +9,10 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { InvoiceEntity } from '../../database/entity/invoice.entity';
+import { InvoiceEntity, PaymentEntity, SenderEntity } from '../../database';
 import { InvoiceViewModel } from './view-model/invoice.view-model';
-import { PaymentEntity } from '../../database/entity/payment.entity';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { InvoiceFileViewModel } from './view-model/invoice-file.view-model';
-import { SenderEntity } from '../../database/entity/sender.entity';
 import {
   INVOICE_GENERATE_QUEUE_NAME,
   MAIL_SENDER_QUEUE_NAME,

@@ -3,7 +3,7 @@ import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { CompanyEntity } from '../../database/entity/company.entity';
+import { CompanyEntity } from '../../database';
 import { CompanyViewModel } from './view-model/company.view-model';
 import { CreateCompanyInfoDto } from './dto/create-company-info.dto';
 
